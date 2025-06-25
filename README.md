@@ -52,6 +52,25 @@ Describe the different ways the useEffect hook can be triggered in a React compo
 
 ### Response 3
 
+The useEffect hook in React allows developers to perform side effects in functional components, such as data fetching, subscriptions, or manually updating the DOM. How and when useEffect runs is determined by the dependency array, which is the second argument passed to useEffect.
+
+Here are the three main ways useEffect can be triggered:
+
+1- useEffect(() => {
+console.log("Effect runs after every render");
+});
+Explanation: If you omit the dependency array, the effect will run after every render, including the initial one. This can lead to performance issues if not managed carefully.
+
+2- useEffect(() => {
+console.log("Effect runs only on initial render");
+}, []);
+Explanation: An empty array tells React to run the effect only once—after the initial render. This is commonly used for data fetching or setting up event listeners when a component mounts.
+
+3- useEffect(() => {
+console.log(`Count is now ${count}`);
+}, [count]);
+Explanation: If you pass values inside the array (e.g., count), the effect will only re-run if those values change. This ensures efficient updates based on specific state or prop changes.
+
 ## Prompt 4
 
 The component below makes a mistake when using useEffect. When running this code, we will get an error from React! Please fix this code.
@@ -80,3 +99,35 @@ const DogDisplay = () => {
 After fixing the code provide and explanation to what you fixed and why it needed to be fixed.
 
 ### Response 4
+
+import React, { useState, useEffect } from "react";
+
+const DogDisplay = () => {
+const [imgSrc, setImgSrc] = useState(
+"https://images.dog.ceo/breeds/hound-english/n02089973_612.jpg"
+);
+
+useEffect(() => {
+const fetchDogImage = async () => {
+try {
+const response = await fetch("https://dog.ceo/api/breeds/image/random");
+if (!response.ok) throw new Error(`Error: ${response.status}`);
+const data = await response.json();
+setImgSrc(data.message);
+} catch (error) {
+console.error(error);
+}
+};
+
+    fetchDogImage();
+
+}, []);
+
+return <img src={imgSrc} alt="A random dog" />;
+};
+
+export default DogDisplay;
+
+The original code incorrectly used an async function directly inside useEffect,
+
+useEffect should not take an async function directly. This is because useEffect expects its callback to either return nothing or a cleanup function—not a promise. Using async causes React to see a returned promise, which leads to warnings or unexpected behavior.
